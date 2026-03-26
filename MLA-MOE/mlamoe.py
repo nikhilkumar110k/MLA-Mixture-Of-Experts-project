@@ -4,7 +4,7 @@ from mla import MLA
 from moe import MOE
 
 
-class MLAMOE(nn.Modules):
+class MLAMOE(nn.Module):
     def __init__(self,embed,heads,d_latent=64,n_experts=4):
         super().__init__()
 
@@ -16,6 +16,7 @@ class MLAMOE(nn.Modules):
 
     def forward(self,x):
         x=x+self.attn(self.ln1(x))
-        x=x+self.moe(self.ln2(x))
-        return x
+        h,aux_loss= self.moe(self.ln2(x))
+        x=x+h
+        return x,aux_loss
 

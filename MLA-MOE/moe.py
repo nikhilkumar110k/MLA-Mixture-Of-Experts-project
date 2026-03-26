@@ -36,6 +36,14 @@ class MOE(nn.Module):
                 weights=topk_vals.view(-1)[indices].unsqueeze(-1)
                 output[indices] +=weights*out 
 
-        return output.view(B,T,C)
-        
+        importance =probs.mean(dim=(0,1))   
+        load = torch.zeros_like(importance)
+
+        for i in range(self.n_experts):
+            load[i]= (topk_idx == i).float().mean()
+
+        aux_loss= (importance * load).sum()
+
+        return output.view(B, T, C), aux_loss
+                
 

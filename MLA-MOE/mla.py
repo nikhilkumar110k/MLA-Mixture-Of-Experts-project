@@ -1,7 +1,7 @@
 import torch 
 import torch.nn as nn 
 
-class MLA(torch.Modules):
+class MLA(torch.Module):
     def __init__(self,embed_size,num_heads,d_latent=64):
      super().__init__()
      self.embed_size=embed_size
@@ -25,9 +25,9 @@ class MLA(torch.Modules):
        V=self.v(x)
 
        Z_k=self.w_down(K)
-       Z_v=self.w_up(V)
+       Z_v=self.w_down(V)
 
-       K=self.w_down(Z_k)
+       K=self.w_up(Z_k)
        V=self.w_up(Z_v)
 
        Q= Q.view(B,T,self.num_heads,self.head_dim).transpose(1,2)
@@ -35,8 +35,8 @@ class MLA(torch.Modules):
        V= V.view(B,T,self.num_heads,self.head_dim).transpose(1,2)
 
        attn= (Q@K.transpose(-2,-1))/(self.head_dim ** 0.5)
-       attn= torch.softmax(attn,dim=1)
+       attn= torch.softmax(attn,dim=-1)
        out=attn@V
-       out=out.transpose(1,2).reshape(B,T,C)
+       out=out.transpose(1,2).contigous().reshape(B,T,C)
 
        return self.out(out)
