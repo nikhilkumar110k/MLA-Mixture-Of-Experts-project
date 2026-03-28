@@ -57,14 +57,14 @@ train_dataset=IMDBdataset(train_texts,train_labels,vocab)
 val_dataset=IMDBdataset(val_texts,val_labels,vocab)
 
 train_loader=DataLoader(train_dataset,batch_size=32,shuffle=True)
-val_loadder=DataLoader(val_dataset,batch_size=32)
+val_loader=DataLoader(val_dataset,batch_size=32)
 
 model_t5= GPTClassifier(vocab_size)
 model_mlamoe= MLAMOEClassifier(vocab_size)
 
 def train_one_epoch(model,loader,optimizer):
     model.train()
-    total_loss=None
+    total_loss=0
     for x,y in loader:
         x,y=x.to(device),y.to(device)
 
@@ -90,3 +90,30 @@ def evaluate(model,loader):
     with torch.no_grad():
         for x,y in loader:
             x,y= x.to(device),y.to(device)
+            out=model(x)
+            logits=out[0] if isinstance(out,tuple) else out
+            preds= torch.argmax(logits,dim=-1)
+
+            correct+=(preds==y).sum().item()
+            total=y.size(0)
+        return correct/total
+
+def run_model(model,name):
+    model=model.to(device)
+    optimizer=torch.optim.AdamW(model.parameters(),lr=3e-4)
+
+    for epoch in range(5):
+        start= time.time()
+
+        loss= train_one_epoch(model,train_loader,optimizer)
+        acc= evaluate(model,val_loader)
+
+        print(f"epoch {epoch}")
+        print(f"loss {loss}")
+        print(f"accuracy {acc}")
+        print(f"time_taken: {time.time()-start:.2f}")
+    memory=torch.cuda.max_memory_allocated / 1e6 if device=="cuda" else 0
+    params=sum(p.numel() for p in model.parameters())
+
+    return acc,memory,params
+    
