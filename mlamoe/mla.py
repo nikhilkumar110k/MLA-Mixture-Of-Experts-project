@@ -1,7 +1,7 @@
 import torch 
 import torch.nn as nn 
 
-class MLA(torch.Module):
+class MLA(nn.Module):
     def __init__(self,embed_size,num_heads,d_latent=64):
      super().__init__()
      self.embed_size=embed_size
@@ -37,6 +37,6 @@ class MLA(torch.Module):
        attn= (Q@K.transpose(-2,-1))/(self.head_dim ** 0.5)
        attn= torch.softmax(attn,dim=-1)
        out=attn@V
-       out=out.transpose(1,2).contigous().reshape(B,T,C)
+       out=out.transpose(1,2).contiguous().reshape(B,T,C)
 
        return self.out(out)
