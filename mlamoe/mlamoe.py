@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
-from mla import MLA
-from moe import MOE
-
+from mlamoe.mla import MLA
+from mlamoe.moe import MOE
 
 
 class MLAMOE(nn.Module):

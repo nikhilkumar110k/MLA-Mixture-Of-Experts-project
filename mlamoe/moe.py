@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from experts import Expert 
+from mlamoe.experts import Expert 
 
 class MOE(nn.Module):
     def __init__(self,embed,n_experts=4,k=3):

@@ -16,8 +16,8 @@ dataset= load_dataset("imdb")
 train_texts=dataset["train"]["text"][:10000]
 train_labels=dataset["train"]["label"][:10000]
 
-val_texts=dataset["test"]["text"][":2000"]
-val_labels=dataset["test"]["label"][":2000"]
+val_texts=dataset["test"]["text"][:2000]
+val_labels=dataset["test"]["label"][:2000]
 
 def build_vocab(texts,max_size=20000):
     counter=Counter()
@@ -49,7 +49,7 @@ class IMDBdataset(Dataset):
     def __len__(self):
         return len(self.texts)
     def __getitem__(self,idx):
-        x=encode(self.texts[idx])
+        x=encode(self.texts[idx],self.vocab)
         y= torch.tensor(self.labels[idx])
         return x,y
 
@@ -74,7 +74,10 @@ def train_one_epoch(model,loader,optimizer):
 
         if isinstance(out,tuple):
             logits,aux_loss=out
-            loss=F.cross_entropy(logits,y)
+            loss=F.cross_entropy(logits,y)+ 0.01 * aux_loss
+        else: 
+            logits= out
+            loss= F.cross_entropy(logits,y)
         loss.backward()
         clip_grad_norm_(model.parameters(),1.0)
         optimizer.step()
@@ -95,7 +98,7 @@ def evaluate(model,loader):
             preds= torch.argmax(logits,dim=-1)
 
             correct+=(preds==y).sum().item()
-            total=y.size(0)
+            total+=y.size(0)
         return correct/total
 
 def run_model(model,name):

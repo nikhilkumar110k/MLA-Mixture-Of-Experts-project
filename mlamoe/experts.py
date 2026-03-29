@@ -5,7 +5,7 @@ class Expert(nn.Module):
     def __init__(self,embed):
         super().__init__()
         self.net=nn.Sequential(
-            nn.linear(embed,embed*4),
+            nn.Linear(embed,embed*4),
             nn.GELU(),
             nn.Linear(embed*4,embed)
         )
