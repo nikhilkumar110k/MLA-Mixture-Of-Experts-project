@@ -98,7 +98,7 @@ def evaluate(model,loader):
             preds= torch.argmax(logits,dim=-1)
 
             correct+=(preds==y).sum().item()
-            total+=y.size(0)
+            total=y.size(0)
         return correct/total
 
 def run_model(model,name):
@@ -110,6 +110,7 @@ def run_model(model,name):
 
         loss= train_one_epoch(model,train_loader,optimizer)
         acc= evaluate(model,val_loader)
+        print(f"model type: {name}")
 
         print(f"epoch {epoch}")
         print(f"loss {loss}")
