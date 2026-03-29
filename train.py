@@ -106,6 +106,7 @@ def run_model(model,name):
     optimizer=torch.optim.AdamW(model.parameters(),lr=3e-4,weight_decay=0.01)
     save_path = f"checkpoints/{name}"
     os.makedirs(save_path, exist_ok=True)
+    best_acc=0.0
 
     for epoch in range(5):
         start= time.time()
