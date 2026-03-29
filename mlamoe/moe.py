@@ -29,12 +29,12 @@ class MOE(nn.Module):
             mask= (topk_idx==expert_id)
 
             if mask.any():
-                token_idx,k_idx=mask.nonzero(as_tuple=True)[0]
+                token_idx,k_idx=mask.nonzero(as_tuple=True)
                 tokens=x_flat[token_idx]
 
                 out=self.experts[expert_id](tokens)
 
-                weights=topk_vals.view(-1)[token_idx,k_idx].unsqueeze(-1)
+                weights=topk_vals[token_idx,k_idx].unsqueeze(-1)
                 output[token_idx] +=weights*out 
 
         importance =probs.mean(dim=(0,1))   
