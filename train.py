@@ -13,8 +13,8 @@ from torch.nn.utils import clip_grad_norm_
 device= "cuda" if torch.cuda.is_available() else "cpu"
 
 dataset= load_dataset("imdb")
-train_texts=dataset["train"]["text"][:10000]
-train_labels=dataset["train"]["label"][:10000]
+train_texts=dataset["train"]["text"][:20000]
+train_labels=dataset["train"]["label"][:20000]
 
 val_texts=dataset["test"]["text"][:2000]
 val_labels=dataset["test"]["label"][:2000]
@@ -98,12 +98,12 @@ def evaluate(model,loader):
             preds= torch.argmax(logits,dim=-1)
 
             correct+=(preds==y).sum().item()
-            total=y.size(0)
+            total+=y.size(0)
         return correct/total
 
 def run_model(model,name):
     model=model.to(device)
-    optimizer=torch.optim.AdamW(model.parameters(),lr=3e-4)
+    optimizer=torch.optim.AdamW(model.parameters(),lr=3e-4,weight_decay=0.01)
 
     for epoch in range(5):
         start= time.time()
@@ -116,7 +116,7 @@ def run_model(model,name):
         print(f"loss {loss}")
         print(f"accuracy {acc}")
         print(f"time_taken: {time.time()-start:.2f}")
-    memory=torch.cuda.max_memory_allocated / 1e6 if device=="cuda" else 0
+    memory=torch.cuda.max_memory_allocated() / 1e6 if device=="cuda" else 0
     params=sum(p.numel() for p in model.parameters())
 
     return acc,memory,params
