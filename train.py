@@ -8,7 +8,7 @@ import torch.nn as nn
 from selfattention.tselfattention import GPTClassifier
 from mlamoe.mlamoe import MLAMOEClassifier
 from torch.nn.utils import clip_grad_norm_
-
+import os 
 
 device= "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -104,6 +104,8 @@ def evaluate(model,loader):
 def run_model(model,name):
     model=model.to(device)
     optimizer=torch.optim.AdamW(model.parameters(),lr=3e-4,weight_decay=0.01)
+    save_path = f"checkpoints/{name}"
+    os.makedirs(save_path, exist_ok=True)
 
     for epoch in range(5):
         start= time.time()
@@ -116,6 +118,15 @@ def run_model(model,name):
         print(f"loss {loss}")
         print(f"accuracy {acc}")
         print(f"time_taken: {time.time()-start:.2f}")
+        if acc > best_acc:
+            best_acc = acc
+            torch.save({
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "accuracy": acc,
+                "epoch": epoch
+            }, f"{save_path}/best{name}.pt")
+    torch.save(model.state_dict(), f"{save_path}/final{name}.pt")
     memory=torch.cuda.max_memory_allocated() / 1e6 if device=="cuda" else 0
     params=sum(p.numel() for p in model.parameters())
 
