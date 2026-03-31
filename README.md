@@ -99,6 +99,7 @@ uv pip install torch datasets
 2️⃣ Run training + benchmarking
 
 uv run main.py
+
 uv run benchmark.py
 ---
 
