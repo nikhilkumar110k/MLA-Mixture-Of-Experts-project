@@ -3,7 +3,7 @@ import torch.nn as nn
 from mlamoe.experts import Expert 
 
 class MOE(nn.Module):
-    def __init__(self,embed,n_experts=4,k=2):
+    def __init__(self,embed,n_experts=3,k=1):
         super().__init__()
         self.k=k
         self.n_experts=n_experts

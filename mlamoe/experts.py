@@ -7,6 +7,7 @@ class Expert(nn.Module):
         self.net=nn.Sequential(
             nn.Linear(embed,embed*4),
             nn.GELU(),
+            nn.Dropout(0.1),
             nn.Linear(embed*4,embed)
         )
     def forward(self,x):
